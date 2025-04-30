@@ -9,6 +9,7 @@ build:
     - sentencepiece
     - transformers
     - git+https://github.com/huggingface/diffusers.git
+    - git+https://github.com/alexarmbr/TaylorSeer.git
 
 predict: "predict.py:Predictor"
     

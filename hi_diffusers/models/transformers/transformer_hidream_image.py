@@ -227,6 +227,8 @@ class HiDreamImageBlock(nn.Module):
             rope,
         )
 
+from taylor_seer import taylor_seer
+@taylor_seer(n_derivatives=2)
 class HiDreamImageTransformer2DModel(
     ModelMixin, ConfigMixin, PeftAdapterMixin, FromOriginalModelMixin
 ):
@@ -520,7 +522,7 @@ class HiDreamImageTransformer2DModel(
             # remove `lora_scale` from each PEFT layer
             unscale_lora_layers(self, lora_scale)
 
-        if not return_dict:
-            return (output, image_tokens_masks)
-        return Transformer2DModelOutput(sample=output, mask=image_tokens_masks)
+        if return_dict:
+            raise Exception("return_dict=True not support with taylor_seer")
+        return output
         

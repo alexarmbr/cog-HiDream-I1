@@ -168,11 +168,18 @@ class Predictor(BasePredictor):
             choices=RESOLUTION_OPTIONS,
             default="1024 × 1024 (Square)",
         ),
+        go_fast: bool = Input(description="Enable activation caching", default=True),
         seed: int = Input(description="Random seed for reproducibility", default=-1),
         model_type: str = Input(description="Model type to use", choices=list(MODEL_CONFIGS.keys()), default="fast"),
         output_format: str = Input(description="Output image format", choices=["png", "webp"], default="png"),
     ) -> Path:
         """Run a single prediction on the model"""
+        # Load different model if requested
+        if go_fast:
+            self.pipe.transformer.reset_cache(warmup_steps=4, skip_interval_steps=2)
+        else:
+            self.pipe.transformer.reset_cache(warmup_steps=1, skip_interval_steps=1)
+        
         # Load different model if requested
         if model_type != self.model_type:
             self._switch_pipe(model_type)
@@ -190,7 +197,6 @@ class Predictor(BasePredictor):
 
         # Generate image
         t0 = time.time()
-        # with torch.no_grad():
         images = self.pipe(
             prompt=prompt,
             height=height,
